@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Olimpia Splendid Unico",
+        "description": "Choose how to add your device.",
+        "menu_options": {
+          "manual_ip": "Configured device (enter IP)",
+          "ble_scan": "New device (BLE setup)"
+        }
+      },
+      "manual_ip": {
+        "title": "Manual Connection",
+        "description": "Enter the IP address of your Olimpia Splendid device.",
+        "data": {
+          "host": "IP Address",
+          "port": "Port"
+        }
+      },
+      "ble_scan": {
+        "title": "BLE Device Scan",
+        "description": "Select the Olimpia Splendid device found via Bluetooth.",
+        "data": {
+          "ble_device": "Device"
+        }
+      },
+      "ble_pin": {
+        "title": "BLE Pairing",
+        "description": "Enter the device PIN and WiFi credentials.",
+        "data": {
+          "pin": "Device PIN",
+          "ssid": "WiFi SSID",
+          "wifi_password": "WiFi Password"
+        }
+      },
+      "ble_pairing": {
+        "title": "Pairing in progress",
+        "description": "BLE pairing and WiFi configuration in progress. This may take up to 60 seconds.",
+        "progress_action": "ble_pairing"
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to device",
+      "invalid_auth": "Authentication failed",
+      "no_credentials": "No credentials found for this device",
+      "ble_no_devices": "No Olimpia Splendid devices found via BLE",
+      "ble_pairing_failed": "BLE pairing failed",
+      "unknown": "Unknown error"
+    },
+    "abort": {
+      "already_configured": "Device already configured",
+      "ble_pairing_failed": "BLE pairing failed. Check the device is in pairing mode and try again."
+    }
+  }
+}
