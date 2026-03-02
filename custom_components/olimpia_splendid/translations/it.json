@@ -35,8 +35,7 @@
       },
       "ble_pairing": {
         "title": "Pairing in corso",
-        "description": "Pairing BLE e configurazione WiFi in corso. Potrebbe richiedere fino a 60 secondi.",
-        "progress_action": "ble_pairing"
+        "description": "Pairing BLE e configurazione WiFi in corso. Potrebbe richiedere fino a 60 secondi."
       }
     },
     "error": {

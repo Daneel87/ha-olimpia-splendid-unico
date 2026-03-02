@@ -35,8 +35,7 @@
       },
       "ble_pairing": {
         "title": "Pairing in progress",
-        "description": "BLE pairing and WiFi configuration in progress. This may take up to 60 seconds.",
-        "progress_action": "ble_pairing"
+        "description": "BLE pairing and WiFi configuration in progress. This may take up to 60 seconds."
       }
     },
     "error": {
