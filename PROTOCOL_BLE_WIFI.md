@@ -1,6 +1,6 @@
 # Olimpia Splendid Unico — BLE & WiFi Protocol
 
-Combined documentation for BLE and WiFi transports. BLE-specific details are fully documented here; shared protocol elements (TLV, encryption, HVAC, scheduler, cloud) are cross-referenced to [PROTOCOL.md](PROTOCOL.md).
+Combined documentation for BLE and WiFi transports.
 
 **Source**: Reverse-engineered from APK `it.olimpiasplendid.unico.app_1.0.9.apk` (Codermine) and verified against the physical device.
 
@@ -75,8 +75,6 @@ The TLV (Type-Length-Value) packet format is identical on both transports:
 Response format: `[0x00] [length] [ackType] [ackResponse] [ackData...]`
 - `ackResponse = 0x00` → success
 - `ackResponse = 0xCC` → WrongCC (counter check failed)
-
-See [PROTOCOL.md § 2](PROTOCOL.md#2-formato-tlv-type-length-value) for full details.
 
 ---
 
@@ -195,8 +193,6 @@ Between each fragment, the host sends the standard plaintext ACK: `[0x00, 0x02, 
 | RX encrypted frags | All encrypted | First encrypted, rest plaintext |
 | ACK delay | None needed | ~80 ms before each ACK |
 
-See [PROTOCOL.md § 9](PROTOCOL.md#9-frammentazione-verificato) for WiFi fragmentation details.
-
 ---
 
 ## 5. Encryption
@@ -216,8 +212,6 @@ Encrypted frame on wire:
 ```
 
 On WiFi, this is then hex-encoded before transmission. On BLE, it's sent as raw bytes.
-
-See [PROTOCOL.md § 6](PROTOCOL.md#6-crittografia-verificato) for full details (key derivation, counter check, AAD breakdown).
 
 ---
 
@@ -244,8 +238,6 @@ After step 8, encryption is active. Step 11 (SEND_PIN) **persists the user** on 
 **Key derivation**: secp256r1 ECDH → shared secret → `LTK = SHA-256(secret)[0:16]` → `session_key = AES-ECB(LTK, rndDevice[0:8] || rndHost[0:8])`.
 
 **device_uid**: Extracted from X.509 certificate CN. CN is zero-padded (e.g. `"0000000000014980"`), trimmed via `f"{int(cn):08d}"` → `"00014980"`, used as 8 UTF-8 bytes in AAD.
-
-See [PROTOCOL.md § 6.2](PROTOCOL.md#62-protocollo-di-pairing-ecdh-verificato) and [§ 17](PROTOCOL.md#17-pairing--state-machine-completa-c0sjava) for the full state machine.
 
 ---
 
@@ -298,7 +290,7 @@ Complete sequence from BLE scan to TCP-ready:
 
 HVAC control commands are identical on both transports. The same opcodes, payloads, and response formats apply whether sent over TCP or BLE (during provisioning, before WiFi is configured).
 
-See [PROTOCOL.md § 3-5](PROTOCOL.md#3-comandi-hvac-operazioni-principali) for the complete opcode table, including:
+Complete opcode table:
 - Power ON/OFF (0x26/0x27)
 - Temperature set/get (0x10/0x17)
 - Mode set/get (0x14/0x15)
@@ -306,10 +298,6 @@ See [PROTOCOL.md § 3-5](PROTOCOL.md#3-comandi-hvac-operazioni-principali) for t
 - Flap toggle (0x52), Night mode (0x16)
 - Commit rules (0x31)
 - Status snapshot push (0x61, 8 bytes)
-
-See [PROTOCOL.md § 11](PROTOCOL.md#11-status-snapshot-notifica-push) for the ClimaStateEvent (0x61) format.
-
-See [PROTOCOL.md § 12](PROTOCOL.md#12-scheduler--timer) for scheduler commands.
 
 ---
 
@@ -328,15 +316,11 @@ After step 4, encryption is active with a new session key derived from the new r
 
 **BLE is not used for reconnect** — it serves only for initial provisioning and pairing. All subsequent device control goes through TCP.
 
-See [PROTOCOL.md § 10](PROTOCOL.md#10-reconnect--autenticazione-verificato) for full details.
-
 ---
 
 ## 10. Cloud REST API
 
 The cloud API acts as a transparent TLV proxy. Same protocol, different transport.
-
-See [PROTOCOL.md § 13](PROTOCOL.md#13-cloud-rest-api) for endpoints, authentication, and TLV-over-REST format.
 
 ---
 
@@ -344,9 +328,8 @@ See [PROTOCOL.md § 13](PROTOCOL.md#13-cloud-rest-api) for endpoints, authentica
 
 | Resource | Description |
 |-|-|
-| [PROTOCOL.md](PROTOCOL.md) | Full WiFi TCP protocol documentation (1000+ lines) |
-| [olimpia_ble.py](olimpia_ble.py) | BLE client: GATT transport, fragmentation, provisioning |
-| [olimpia/client.py](olimpia/client.py) | TCP client: pairing, reconnect, HVAC commands |
-| [olimpia/crypto.py](olimpia/crypto.py) | ECDH + AES-GCM implementation |
-| [olimpia/tlv.py](olimpia/tlv.py) | TLV packet structure |
-| [olimpia/enums.py](olimpia/enums.py) | Opcodes, modes, fan speeds, flap positions |
+| [olimpia_ble.py](custom_components/olimpia_splendid/olimpia_ble.py) | BLE client: GATT transport, fragmentation, provisioning |
+| [client.py](custom_components/olimpia_splendid/olimpia/client.py) | TCP client: pairing, reconnect, HVAC commands |
+| [crypto.py](custom_components/olimpia_splendid/olimpia/crypto.py) | ECDH + AES-GCM implementation |
+| [tlv.py](custom_components/olimpia_splendid/olimpia/tlv.py) | TLV packet structure |
+| [enums.py](custom_components/olimpia_splendid/olimpia/enums.py) | Opcodes, modes, fan speeds, flap positions |
