@@ -37,7 +37,7 @@ class OlimpiaSplendidConfigFlow(ConfigFlow, domain=DOMAIN):
         """Step iniziale: scelta metodo."""
         return self.async_show_menu(
             step_id="user",
-            menu_options=["manual_ip", "ble_scan"],
+            menu_options=["ble_scan", "manual_ip"],
         )
 
     # --- Path A: IP manuale ---

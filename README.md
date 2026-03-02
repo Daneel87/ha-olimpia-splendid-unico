@@ -34,7 +34,7 @@ Custom [Home Assistant](https://www.home-assistant.io/) integration for **Olimpi
 
 ### Manual
 
-1. Copy `custom_components/olimpia_splendid/` into your HA `config/custom_components/` directory
+1. Copy `custom_components/olimpia_splendid/` into `/homeassistant/custom_components/`
 2. Restart Home Assistant
 
 ## Configuration

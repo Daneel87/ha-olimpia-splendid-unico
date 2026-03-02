@@ -5,8 +5,8 @@
         "title": "Olimpia Splendid Unico",
         "description": "Scegli come aggiungere il dispositivo.",
         "menu_options": {
-          "manual_ip": "Dispositivo configurato (inserisci IP)",
-          "ble_scan": "Nuovo dispositivo (setup BLE)"
+          "ble_scan": "Nuovo dispositivo — setup BLE (consigliato)",
+          "manual_ip": "Dispositivo configurato (inserisci IP)"
         }
       },
       "manual_ip": {

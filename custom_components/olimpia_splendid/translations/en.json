@@ -5,8 +5,8 @@
         "title": "Olimpia Splendid Unico",
         "description": "Choose how to add your device.",
         "menu_options": {
-          "manual_ip": "Configured device (enter IP)",
-          "ble_scan": "New device (BLE setup)"
+          "ble_scan": "New device — BLE setup (recommended)",
+          "manual_ip": "Configured device (enter IP)"
         }
       },
       "manual_ip": {
