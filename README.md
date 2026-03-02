@@ -43,12 +43,12 @@ After installation, go to **Settings → Devices & Services → Add Integration*
 
 You will be offered two setup paths:
 
+- **BLE Setup (recommended)**: the easiest and most automated method. Scan for nearby Unico devices via Bluetooth, enter the PIN (printed on the unit), complete ECDH pairing, configure WiFi, and the integration will automatically discover the device IP. No manual steps required beyond entering PIN and WiFi credentials.
 - **Manual IP**: enter the device IP address directly. Credentials are imported from `~/.olimpia/` if available, or you can pair first using the standalone CLI.
-- **BLE Setup**: scan for nearby Unico devices via Bluetooth, enter the PIN (printed on the unit), complete ECDH pairing, configure WiFi, and the integration will automatically discover the device IP.
 
 ## Compatibility
 
-Tested with Olimpia Splendid Unico air conditioners (app version 1.0.9). Other Unico models using the same protocol should work.
+Tested on **Olimpia Splendid Unico Pro** with **B1015 WiFi board**. Should work with all Unico models equipped with the same B1015 board (same protocol and app — Olimpia Splendid Unico v1.0.9).
 
 ## License
 
