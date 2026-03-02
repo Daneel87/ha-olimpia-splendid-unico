@@ -1,0 +1,28 @@
+# Development / analysis files
+decompiled/
+*.apk
+*.jpg
+analysis_*.md
+ANALYSIS_PLAN.md
+PROTOCOL.md
+USAGE.md
+MEMORY.md
+CLAUDE.md
+.claude/
+
+# Root-level dev scripts (not part of HA integration)
+/olimpia_client.py
+/olimpia_ble.py
+/test_reset.py
+/olimpia/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Allow brand assets
+!custom_components/olimpia_splendid/brand/*.png

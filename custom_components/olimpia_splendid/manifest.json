@@ -1,0 +1,12 @@
+{
+  "domain": "olimpia_splendid",
+  "name": "Olimpia Splendid Unico",
+  "after_dependencies": ["bluetooth"],
+  "codeowners": ["@Daneel87"],
+  "config_flow": true,
+  "documentation": "https://github.com/Daneel87/ha-olimpia-splendid-unico",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Daneel87/ha-olimpia-splendid-unico/issues",
+  "requirements": ["cryptography>=41.0.0", "bleak>=0.21.0"],
+  "version": "0.1.0"
+}

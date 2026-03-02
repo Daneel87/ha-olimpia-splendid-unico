@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Olimpia Splendid Unico",
+        "description": "Scegli come aggiungere il dispositivo.",
+        "menu_options": {
+          "manual_ip": "Dispositivo configurato (inserisci IP)",
+          "ble_scan": "Nuovo dispositivo (setup BLE)"
+        }
+      },
+      "manual_ip": {
+        "title": "Connessione manuale",
+        "description": "Inserisci l'indirizzo IP del dispositivo Olimpia Splendid.",
+        "data": {
+          "host": "Indirizzo IP",
+          "port": "Porta"
+        }
+      },
+      "ble_scan": {
+        "title": "Scansione BLE",
+        "description": "Seleziona il dispositivo Olimpia Splendid trovato via Bluetooth.",
+        "data": {
+          "ble_device": "Dispositivo"
+        }
+      },
+      "ble_pin": {
+        "title": "Pairing BLE",
+        "description": "Inserisci il PIN del dispositivo e le credenziali WiFi.",
+        "data": {
+          "pin": "PIN dispositivo",
+          "ssid": "SSID WiFi",
+          "wifi_password": "Password WiFi"
+        }
+      },
+      "ble_pairing": {
+        "title": "Pairing in corso",
+        "description": "Pairing BLE e configurazione WiFi in corso. Potrebbe richiedere fino a 60 secondi.",
+        "progress_action": "ble_pairing"
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi al dispositivo",
+      "invalid_auth": "Autenticazione fallita",
+      "no_credentials": "Nessuna credenziale trovata per questo dispositivo",
+      "ble_no_devices": "Nessun dispositivo Olimpia Splendid trovato via BLE",
+      "ble_pairing_failed": "Pairing BLE fallito",
+      "unknown": "Errore sconosciuto"
+    },
+    "abort": {
+      "already_configured": "Dispositivo gia' configurato",
+      "ble_pairing_failed": "Pairing BLE fallito. Verifica che il dispositivo sia in modalita' pairing e riprova."
+    }
+  }
+}
