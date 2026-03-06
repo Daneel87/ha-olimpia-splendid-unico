@@ -109,6 +109,10 @@ class OlimpiaClimateEntity(CoordinatorEntity[OlimpiaCoordinator], ClimateEntity)
         flap = self._data.get("flap")
         return SWING_DEVICE_TO_HA.get(flap, "off")
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"scheduler_active": bool(self._data.get("scheduler_active"))}
+
     def _optimistic_update(self, **fields) -> None:
         """Aggiorna coordinator data ottimisticamente dopo un comando."""
         if self.coordinator.data:

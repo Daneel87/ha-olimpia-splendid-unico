@@ -92,14 +92,20 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
         with self._tcp_lock:
             client = self._connect_and_auth()
             try:
-                # Refresh + poll per ClimaStateEvent
+                # PING + poll per ClimaStateEvent (NO COMMIT per evitare
+                # che stati SET pendenti vengano applicati dal firmware)
                 client._last_clima_event = None
-                client.refresh()
+                client.ping()
                 client._poll_for_events(2.0)
                 if client._last_clima_event:
                     status = dict(client._last_clima_event)
                 else:
                     status = client.get_status_safe()
+                if status.get("scheduler_active"):
+                    _LOGGER.warning(
+                        "Device scheduler is active — this may cause "
+                        "unexpected HVAC mode changes"
+                    )
                 _LOGGER.debug("poll data: %s", status)
                 return {"status": status, "counter": client._user_counter}
             finally:
