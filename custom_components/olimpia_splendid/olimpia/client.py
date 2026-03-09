@@ -892,10 +892,17 @@ class OlimpiaClient:
         ack = self._send_command(opcode, value, timeout)
         if not ack or not ack.success:
             return False
-        # COMMIT per applicare la modifica
+        # COMMIT per applicare la modifica — senza COMMIT il device reverte
         commit_ack = self._send_command(Opcode.COMMIT)
-        if commit_ack:
-            self._log(f"  COMMIT: success={commit_ack.success}")
+        if not commit_ack or not commit_ack.success:
+            self._log(f"  COMMIT FAILED: {commit_ack}")
+            return False
+        self._log(f"  COMMIT OK")
+        # Post-commit: attendi push 0x61 per confermare stato applicato
+        self._last_clima_event = None
+        self._poll_for_events(3.0)
+        if self._last_clima_event:
+            self._log(f"  Post-commit state: {self._last_clima_event}")
         return True
 
     def ping(self) -> bool:
@@ -905,6 +912,13 @@ class OlimpiaClient:
     def power_on(self) -> bool:
         ack = self._send_command(Opcode.POWER_ON)
         return ack is not None and ack.success
+
+    def power_on_and_set_mode(self, mode: Mode) -> bool:
+        """Power on + set mode in una singola sessione TCP con un solo COMMIT."""
+        ack = self._send_command(Opcode.POWER_ON)
+        if not ack or not ack.success:
+            return False
+        return self._set_command(Opcode.SET_MODE, bytes([int(mode)]))
 
     def power_off(self) -> bool:
         return self._set_command(Opcode.POWER_OFF)

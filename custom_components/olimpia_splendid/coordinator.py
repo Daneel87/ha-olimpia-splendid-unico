@@ -2,6 +2,7 @@
 
 import logging
 import threading
+import time as _time
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
@@ -15,6 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 
 MAX_ATTEMPTS = 3
 RETRY_DELAYS = [3, 5]  # secondi tra tentativi
+COMMAND_GRACE_PERIOD = 5.0  # secondi: salta poll dopo un comando recente
 
 
 class OlimpiaCoordinator(DataUpdateCoordinator):
@@ -92,6 +94,18 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
 
     def _sync_update(self) -> dict:
         with self._tcp_lock:
+            # Grace period: dopo un comando recente, salta il poll per evitare
+            # che una lettura intermedia sovrascriva lo stato appena applicato
+            since_cmd = _time.monotonic() - self._last_command_time
+            if self._last_command_time > 0 and since_cmd < COMMAND_GRACE_PERIOD:
+                _LOGGER.debug(
+                    "Skipping poll (%.1fs since last command, grace=%ss)",
+                    since_cmd, COMMAND_GRACE_PERIOD,
+                )
+                return {
+                    "status": dict(self.data or {}),
+                    "counter": self.credentials.get("user_counter"),
+                }
             client = self._connect_and_auth()
             try:
                 # PING + poll per ClimaStateEvent (NO COMMIT per evitare
@@ -115,7 +129,6 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                     and new_mode is not None
                     and new_mode != self._last_known_mode
                 ):
-                    import time as _time
                     since_cmd = _time.monotonic() - self._last_command_time
                     _LOGGER.warning(
                         "HVAC mode changed without user command: "
@@ -156,7 +169,6 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
             return False
 
     def _sync_command(self, method_name: str, *args) -> bool:
-        import time as _time
         with self._tcp_lock:
             client = self._connect_and_auth()
             try:
@@ -164,6 +176,14 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                 result = method(*args)
                 self._last_command_time = _time.monotonic()
                 _LOGGER.debug("Command %s(%s) -> %s", method_name, args, result)
+                # Se il client ha ricevuto un 0x61 post-commit, aggiorna
+                # coordinator.data con lo stato reale del device
+                if result and client._last_clima_event:
+                    confirmed = dict(client._last_clima_event)
+                    _LOGGER.debug("Post-commit confirmed state: %s", confirmed)
+                    self.hass.loop.call_soon_threadsafe(
+                        self.async_set_updated_data, confirmed
+                    )
                 return result
             finally:
                 client.disconnect()

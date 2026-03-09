@@ -126,17 +126,20 @@ class OlimpiaClimateEntity(CoordinatorEntity[OlimpiaCoordinator], ClimateEntity)
             if ok:
                 self._optimistic_update(power=False)
         else:
-            if not self._data.get("power"):
-                ok = await self.coordinator.async_send_command("power_on")
-                if not ok:
-                    return
             device_mode = MODE_HA_TO_DEVICE.get(hvac_mode)
-            if device_mode is not None:
+            if device_mode is None:
+                return
+            if not self._data.get("power"):
+                # Sessione unica: power_on + set_mode con un solo COMMIT
+                ok = await self.coordinator.async_send_command(
+                    "power_on_and_set_mode", Mode(device_mode)
+                )
+            else:
                 ok = await self.coordinator.async_send_command(
                     "set_mode", Mode(device_mode)
                 )
-                if ok:
-                    self._optimistic_update(power=True, mode=device_mode)
+            if ok:
+                self._optimistic_update(power=True, mode=device_mode)
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         temp = kwargs.get(ATTR_TEMPERATURE)
