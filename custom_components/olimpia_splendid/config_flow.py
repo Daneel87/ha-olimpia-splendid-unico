@@ -1,6 +1,7 @@
 """Config flow per Olimpia Splendid Unico."""
 
 import asyncio
+import json
 import logging
 import socket
 from typing import Any
@@ -51,14 +52,29 @@ class OlimpiaSplendidConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             host = user_input["host"]
             port = user_input.get("port", DEFAULT_PORT)
+            creds_json = user_input.get("credentials_json", "").strip()
 
-            # Cerca credenziali su disco
-            creds = await self.hass.async_add_executor_job(
-                load_credentials, host
-            )
-            if not creds:
-                errors["base"] = "no_credentials"
-            else:
+            creds = None
+            if creds_json:
+                # Parse pasted credentials JSON
+                try:
+                    creds = json.loads(creds_json)
+                    required = ("user_hash", "user_counter", "device_uid", "crypto")
+                    if not all(k in creds for k in required):
+                        errors["base"] = "invalid_credentials_json"
+                        creds = None
+                except (json.JSONDecodeError, ValueError):
+                    errors["base"] = "invalid_credentials_json"
+
+            if not creds and not errors:
+                # Fallback: load from disk
+                creds = await self.hass.async_add_executor_job(
+                    load_credentials, host
+                )
+                if not creds:
+                    errors["base"] = "no_credentials"
+
+            if creds and not errors:
                 # Tenta connessione + auth
                 try:
                     ok = await self.hass.async_add_executor_job(
@@ -89,6 +105,7 @@ class OlimpiaSplendidConfigFlow(ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required("host"): str,
                     vol.Optional("port", default=DEFAULT_PORT): int,
+                    vol.Optional("credentials_json", default=""): str,
                 }
             ),
             errors=errors,

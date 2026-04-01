@@ -11,10 +11,11 @@
       },
       "manual_ip": {
         "title": "Connessione manuale",
-        "description": "Inserisci l'indirizzo IP del dispositivo Olimpia Splendid.",
+        "description": "Inserisci l'IP del dispositivo. Puoi incollare il JSON delle credenziali generato dal tool BLE (~/.olimpia/<IP>.json), oppure lascia vuoto per caricarle da disco.",
         "data": {
           "host": "Indirizzo IP",
-          "port": "Porta"
+          "port": "Porta",
+          "credentials_json": "Credenziali JSON (opzionale)"
         }
       },
       "ble_scan": {
@@ -41,7 +42,8 @@
     "error": {
       "cannot_connect": "Impossibile connettersi al dispositivo",
       "invalid_auth": "Autenticazione fallita",
-      "no_credentials": "Nessuna credenziale trovata per questo dispositivo",
+      "no_credentials": "Nessuna credenziale trovata. Esegui prima il tool di pairing BLE (vedi tools/ nel repository), poi incolla il contenuto JSON qui sopra oppure copia il file in ~/.olimpia/ sulla macchina HA.",
+      "invalid_credentials_json": "JSON credenziali non valido. Incolla il contenuto completo del file ~/.olimpia/<IP>.json generato dal tool di pairing BLE.",
       "ble_no_devices": "Nessun dispositivo Olimpia Splendid trovato via BLE",
       "ble_pairing_failed": "Pairing BLE fallito",
       "unknown": "Errore sconosciuto"
