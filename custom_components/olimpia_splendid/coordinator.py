@@ -42,6 +42,7 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
         self.credentials: dict = dict(entry.data["credentials"])
         self._tcp_lock = threading.Lock()
         self._last_known_mode: int | None = None
+        self._last_known_power: bool | None = None
         self._last_command_time: float = 0
 
     # --- Persistenza counter ---
@@ -138,6 +139,30 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                         status.get("scheduler"), status.get("power"),
                     )
                 self._last_known_mode = new_mode
+                # Traccia transizioni power non richieste dall'utente
+                new_power = status.get("power")
+                if (
+                    self._last_known_power is not None
+                    and new_power is not None
+                    and new_power != self._last_known_power
+                ):
+                    since_cmd = _time.monotonic() - self._last_command_time
+                    if new_power and since_cmd > COMMAND_GRACE_PERIOD:
+                        _LOGGER.warning(
+                            "PHANTOM POWER ON: device turned ON without user "
+                            "command (%.1fs since last cmd, scheduler=%s, "
+                            "mode=%s). If scheduler is active, disable it "
+                            "via the Scheduler switch.",
+                            since_cmd, status.get("scheduler"),
+                            status.get("mode"),
+                        )
+                    elif not new_power and since_cmd > COMMAND_GRACE_PERIOD:
+                        _LOGGER.warning(
+                            "Device turned OFF without user command "
+                            "(%.1fs since last cmd, scheduler=%s)",
+                            since_cmd, status.get("scheduler"),
+                        )
+                self._last_known_power = new_power
                 _LOGGER.debug("poll data: %s", status)
                 return {"status": status, "counter": client._user_counter}
             finally:
@@ -176,14 +201,8 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                 result = method(*args)
                 self._last_command_time = _time.monotonic()
                 _LOGGER.debug("Command %s(%s) -> %s", method_name, args, result)
-                # Se il client ha ricevuto un 0x61 post-commit, aggiorna
-                # coordinator.data con lo stato reale del device
                 if result and client._last_clima_event:
-                    confirmed = dict(client._last_clima_event)
-                    _LOGGER.debug("Post-commit confirmed state: %s", confirmed)
-                    self.hass.loop.call_soon_threadsafe(
-                        self.async_set_updated_data, confirmed
-                    )
+                    _LOGGER.debug("Post-commit device state: %s", client._last_clima_event)
                 return result
             finally:
                 client.disconnect()

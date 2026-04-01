@@ -122,9 +122,11 @@ class OlimpiaClimateEntity(CoordinatorEntity[OlimpiaCoordinator], ClimateEntity)
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         if hvac_mode == HVACMode.OFF:
-            ok = await self.coordinator.async_send_command("power_off")
+            ok = await self.coordinator.async_send_command(
+                "power_off_and_disable_scheduler"
+            )
             if ok:
-                self._optimistic_update(power=False)
+                self._optimistic_update(power=False, scheduler=False)
         else:
             device_mode = MODE_HA_TO_DEVICE.get(hvac_mode)
             if device_mode is None:

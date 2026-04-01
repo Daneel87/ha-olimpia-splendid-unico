@@ -923,6 +923,16 @@ class OlimpiaClient:
     def power_off(self) -> bool:
         return self._set_command(Opcode.POWER_OFF)
 
+    def power_off_and_disable_scheduler(self) -> bool:
+        """Power off + disabilita scheduler in una singola sessione TCP."""
+        ok = self._set_command(Opcode.POWER_OFF)
+        if not ok:
+            return False
+        ack = self._send_command(Opcode.TOGGLE_SCHEDULER, bytes([0]))
+        if not ack or not ack.success:
+            self._log("[power_off_sched] TOGGLE_SCHEDULER(0) failed, power_off OK")
+        return True
+
     def set_temperature(self, temp_celsius: float) -> bool:
         value_int = int(math.ceil(temp_celsius)) * 10
         value = int_to_le(value_int, 2)
