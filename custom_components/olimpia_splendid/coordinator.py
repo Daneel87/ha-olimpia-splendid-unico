@@ -61,14 +61,17 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
 
     # --- Connessione singola per operazione ---
 
-    def _connect_and_auth(self) -> OlimpiaClient:
+    def _connect_and_auth(self, for_command: bool = False) -> OlimpiaClient:
         """Crea client, connetti, autentica. Raise se fallisce dopo retry."""
+        from .olimpia.enums import Opcode
+        warm_up = Opcode.PING if for_command else Opcode.GET_MODE
         for attempt in range(MAX_ATTEMPTS):
             client = OlimpiaClient(self.host, self.port)
             client.verbose = True
             try:
                 client.connect()
-                ok = client.authenticate_from_dict(self.credentials)
+                ok = client.authenticate_from_dict(self.credentials,
+                                                   warm_up_opcode=warm_up)
                 if ok:
                     _LOGGER.debug("Connected to %s (attempt %d)", self.host, attempt + 1)
                     return client
@@ -214,7 +217,7 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
 
     def _sync_command(self, method_name: str, *args) -> bool:
         with self._tcp_lock:
-            client = self._connect_and_auth()
+            client = self._connect_and_auth(for_command=True)
             try:
                 method = getattr(client, method_name)
                 result = method(*args)

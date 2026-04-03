@@ -811,7 +811,8 @@ class OlimpiaClient:
 
         return True
 
-    def authenticate_from_dict(self, creds: dict, user_id: str = "olimpia-python") -> bool:
+    def authenticate_from_dict(self, creds: dict, user_id: str = "olimpia-python",
+                               warm_up_opcode: int = None) -> bool:
         """Autenticazione da dict (per HA, senza filesystem)."""
         self._encrypted = False
         self._crypto_ok = False
@@ -878,11 +879,18 @@ class OlimpiaClient:
         self._encrypted = True
         self._crypto.counter = 0
 
-        # Warm-up: verifica crypto con GET_MODE (ping causa beep,
-        # GET_ROOM_TEMP attiva fan su device spento)
+        # Warm-up: verifica crypto funzionante.
+        # GET_MODE per polling (niente beep), PING per comandi (neutro per
+        # la state-machine del firmware — GET_MODE impedisce SET+COMMIT).
+        if warm_up_opcode is None:
+            warm_up_opcode = Opcode.GET_MODE
         for i in range(3):
-            ack = self._send_command(Opcode.GET_MODE)
-            if ack is not None and ack.success:
+            if warm_up_opcode == Opcode.PING:
+                ok = self.ping()
+            else:
+                ack = self._send_command(warm_up_opcode)
+                ok = ack is not None and ack.success
+            if ok:
                 self._crypto_ok = True
                 break
 
