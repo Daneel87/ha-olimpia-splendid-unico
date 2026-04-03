@@ -45,6 +45,7 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
         self._last_known_power: bool | None = None
         self._last_known_status: dict | None = None
         self._last_command_time: float = 0
+        self._tracked_flap: int = 0
 
     # --- Persistenza counter ---
 
@@ -133,6 +134,10 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                     status = dict(self.data)
                 else:
                     status = client.get_status_safe()
+                # Override flap from tracked state — the 0x61 byte 7
+                # is unreliable during polling (always reports 0/FIXED
+                # even when the device is actively swinging).
+                status['flap'] = self._tracked_flap
                 if status.get("scheduler"):
                     _LOGGER.warning(
                         "Device scheduler is active — this may cause "
@@ -225,6 +230,11 @@ class OlimpiaCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug("Command %s(%s) -> %s", method_name, args, result)
                 if result and client._last_clima_event:
                     _LOGGER.debug("Post-commit device state: %s", client._last_clima_event)
+                if result and method_name == "toggle_flap":
+                    self._tracked_flap = 1 if args[0] else 0
+                    _LOGGER.debug("Updated tracked_flap to %d", self._tracked_flap)
+                if result and method_name == "power_off_and_disable_scheduler":
+                    self._tracked_flap = 0
                 return result
             finally:
                 client.disconnect()

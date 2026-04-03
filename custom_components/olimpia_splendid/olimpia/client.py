@@ -979,13 +979,20 @@ class OlimpiaClient:
                                  bytes([1 if enabled else 0]))
         return ack is not None and ack.success
 
-    def toggle_flap(self, swing: bool) -> bool:
+    def toggle_flap(self, swing: bool, current_flap: int | None = None) -> bool:
         """Imposta flap SWING/FIXED. Opcode 0x16 è un toggle, quindi
-        legge lo stato corrente e invia solo se diverso dal desiderato."""
-        current = self._last_clima_event.get('flap') if self._last_clima_event else None
-        if current is None:
-            self.get_status_safe()
+        legge lo stato corrente e invia solo se diverso dal desiderato.
+
+        current_flap: stato flap noto dal coordinator (il 0x61 durante
+        polling è inaffidabile per byte 7). Se fornito, viene usato
+        al posto di _last_clima_event."""
+        if current_flap is not None:
+            current = current_flap
+        else:
             current = self._last_clima_event.get('flap') if self._last_clima_event else None
+            if current is None:
+                self.get_status_safe()
+                current = self._last_clima_event.get('flap') if self._last_clima_event else None
 
         current_swing = (current == 1) if current is not None else None
         if current_swing == swing:

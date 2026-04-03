@@ -163,8 +163,9 @@ class OlimpiaClimateEntity(CoordinatorEntity[OlimpiaCoordinator], ClimateEntity)
 
     async def async_set_swing_mode(self, swing_mode: str) -> None:
         swing = swing_mode == "on"
+        current_flap = self.coordinator._tracked_flap
         ok = await self.coordinator.async_send_command(
-            "toggle_flap", swing
+            "toggle_flap", swing, current_flap
         )
         if ok:
             self._optimistic_update(flap=1 if swing else 0)
