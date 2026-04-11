@@ -13,7 +13,7 @@ class Mode(IntEnum):
 
 class Fan(IntEnum):
     LOW = 0
-    MID = 1
+    MEDIUM = 1
     MAX = 2
     AUTO = 3
 

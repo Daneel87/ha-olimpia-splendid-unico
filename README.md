@@ -8,7 +8,7 @@ Custom [Home Assistant](https://www.home-assistant.io/) integration for **Olimpi
 ## Features
 
 - **HVAC modes**: Heat, Cool, Dry, Fan Only, Auto
-- **Fan speed**: Low, Mid, High, Auto
+- **Fan speed**: Low, Medium, High, Auto
 - **Swing**: On / Off
 - **Target temperature** control
 - **Room temperature** reading

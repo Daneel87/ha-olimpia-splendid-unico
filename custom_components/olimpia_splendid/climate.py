@@ -53,7 +53,7 @@ class OlimpiaClimateEntity(CoordinatorEntity[OlimpiaCoordinator], ClimateEntity)
         HVACMode.FAN_ONLY,
         HVACMode.AUTO,
     ]
-    _attr_fan_modes = ["low", "mid", "high", "auto"]
+    _attr_fan_modes = ["low", "medium", "high", "auto"]
     _attr_swing_modes = ["off", "on"]
     _attr_min_temp = 15
     _attr_max_temp = 30

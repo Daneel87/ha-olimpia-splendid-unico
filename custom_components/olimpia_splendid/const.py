@@ -23,7 +23,7 @@ MODE_HA_TO_DEVICE = {v: k for k, v in MODE_DEVICE_TO_HA.items()}
 # Mapping fan device → stringa HA
 FAN_DEVICE_TO_HA = {
     0: "low",
-    1: "mid",
+    1: "medium",
     2: "high",
     3: "auto",
 }
